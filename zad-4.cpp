@@ -85,6 +85,8 @@ int main(int argc, char** argv)
 			type = SinkType::CONSOLE;
 		}
 	else if (sink =="file"){
+			ofstream clear("app.log", ios::trunc); 
+			clear.close();
 			type = SinkType::FILE;
 		}
 	else if (sink =="none"){
@@ -94,12 +96,8 @@ int main(int argc, char** argv)
 			cerr << "Wrong type of sink" << endl;
 			return 1;
 		}
-	if (sink == "file") {
-		ofstream clear("app.log", ios::trunc); 
-		clear.close();
-	}
-
 	Logger::instance().set_sink(type);
+	Logger::instance().log("Test message");
 	Logger::instance().log("Test message");
 	Logger::instance().log("Test message");
 	Logger::instance().log("Test message");
