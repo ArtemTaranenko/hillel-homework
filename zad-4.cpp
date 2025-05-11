@@ -1,6 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <memory> 
+#include <cctype>
+#include <algorithm>
 
 using namespace std;
 
@@ -19,16 +21,15 @@ struct ConsoleSink: LogSink
 
 struct FileSink: LogSink
 {
-	string filename = "app.log";
+	ofstream file;
+	FileSink(): file("app.log", ios::app){
+		if (!(file.is_open())){
+			cerr << "Error with opening file" << endl;
+			}
+		}
 	virtual void write(const std::string& msg) override
 	{
-		ofstream file(filename, ios::app);
-		if (file.is_open()){
 		file << msg << endl;
-		}
-		else {
-			cerr << "Error with opening file" << endl;
-		}
 	}
 };
 
@@ -72,21 +73,30 @@ private:
   Logger& operator = (const Logger& other) = delete;
 };
 
+string to_lower(const string& input)
+{
+	string output = input;
+	transform(output.begin(), output.end(), output.begin(), [] (unsigned char c) { return tolower(c); });
+	return output;
+}
 
 int main(int argc, char** argv)
 {
-	if (argc !=2){
+	if (argc >2){
 		cout << "Usage: <program name>, <type of sink: console, file or none>" << endl;
 		return 1;
 		}
-	string sink = argv[1];
 	SinkType type;
+	if (argc <2){
+		cout << "No type of sink was provided, console sink will be used as default " << endl;
+		type = SinkType::CONSOLE;
+		}
+	else{
+	string sink = to_lower(argv[1]);
 	if (sink == "console"){
 			type = SinkType::CONSOLE;
 		}
 	else if (sink =="file"){
-			ofstream clear("app.log", ios::trunc); 
-			clear.close();
 			type = SinkType::FILE;
 		}
 	else if (sink =="none"){
@@ -96,6 +106,7 @@ int main(int argc, char** argv)
 			cerr << "Wrong type of sink" << endl;
 			return 1;
 		}
+	}
 	Logger::instance().set_sink(type);
 	Logger::instance().log("Test message");
 	Logger::instance().log("Test message");
