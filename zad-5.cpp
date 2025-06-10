@@ -25,8 +25,7 @@ class NumberReader: public INumberReader
 		std::vector<int> numbers;
 		std::ifstream file (filename);
 		if (!file.is_open()){
-			std::cout << "Cannot open file " << std::endl;
-			return numbers;
+			throw std::runtime_error("Cannot open file");
 			}
 		int number;
 		while (file >> number){
@@ -171,6 +170,7 @@ class NumberProcessor
 
 int main(int argc, char** argv)
 {
+	try{
 	if (argc != 3){
 		std::cerr << "Right usage: <program> <filter (EVEN, ODD, GT<n>)> <filename>" << std::endl;
 		return -1;
@@ -200,6 +200,16 @@ int main(int argc, char** argv)
 	std::vector<std::reference_wrapper<INumberObserver>> observers = {count,print};
 	NumberReader reader;
 	NumberProcessor proc(reader, *filter, observers);
+	try{
 	proc.run(argv[2]);
+	} catch (const std::exception& e){
+		std::cerr << "Error processing file: " << e.what() << std::endl;
+		return -1;
+		}
+	} catch (const std::exception& e) {
+		std::cerr << "Fatal error: " << e.what() << std::endl;
+		return -1;
+		}
 	return 0;
+
 }
