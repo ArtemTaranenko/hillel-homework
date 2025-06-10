@@ -7,6 +7,8 @@
 #include <memory>
 #include <functional>
 #include <regex>
+#include <cassert>
+#include <string_view>
 
 class INumberReader
 {
@@ -32,13 +34,14 @@ class NumberReader: public INumberReader
 			}
 		return numbers;
 	}
-	//~NumberReader() = default;
+	~NumberReader() = default;
 };
 
 class INumberFilter
 {
 	public:
 	virtual bool keep (int a) = 0;
+	virtual ~INumberFilter () {}
 };
 
 class EvenFilter: public INumberFilter
@@ -109,7 +112,7 @@ class CountObserver: public INumberObserver
 
 struct IRegistry
 {
-	virtual std::unique_ptr<INumberFilter> create (const std::string& filter_type, const std::string& input) = 0;
+	virtual std::unique_ptr<INumberFilter> create (const std::string& input) = 0;
 };
 
 class FilterFactory: public IRegistry
@@ -132,11 +135,17 @@ class FilterFactory: public IRegistry
 	{
 		this->registry[filter_type] = f;
 	}
-	std::unique_ptr<INumberFilter> create (const std::string& filter_type, const std::string& input)
-	{
-		auto func = this->registry[filter_type];
-		return func(input);
-	}
+	std::unique_ptr<INumberFilter> create( const std::string& input)
+    {
+        for (const auto& [type, factory] : registry) {
+            if (input.starts_with(type)) {
+                return factory(input);
+            }
+        }
+        
+        std::cerr << "No matching filter type found for: " << input << std::endl;
+        return nullptr;
+    }
 };
 
 class NumberProcessor
@@ -185,7 +194,7 @@ int main(int argc, char** argv)
 		int n = std::stoi(fil.substr(2));
 		return std::make_unique<GreaterFilter>(n);
 		});
-	std::unique_ptr<INumberFilter> filter = registry.create(f, argv[1]);
+	std::unique_ptr<INumberFilter> filter = registry.create(f);
 	CountObserver count;
 	PrintObserver print;
 	std::vector<std::reference_wrapper<INumberObserver>> observers = {count,print};
