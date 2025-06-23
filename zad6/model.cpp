@@ -28,16 +28,19 @@ double Model::getKelvin()
 void Model::setCelsius(double cel_value)
 {
     this->celsius = cel_value;
+    emit this->celsiusChanged(this->celsius);
 }
 
 void Model::setFahrenheit(double fahr_value)
 {
     this->fahrenheit = fahr_value;
+    emit this->fahrenheitChanged(this->fahrenheit);
 }
 
 void Model::setKelvin(double kel_value)
 {
     this->kelvin = kel_value;
+    emit this->kelvinChanged(this->kelvin);
 }
 
 

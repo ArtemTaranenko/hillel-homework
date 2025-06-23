@@ -24,11 +24,10 @@ Window {
 
         TextField{
             id: cel
+            text: model.celsius
             Layout.fillWidth: true
             onTextEdited: {
             controller.setCel(cel.text)
-            fahr.text = controller.getFahrenheit()
-            kel.text = controller.getKelvin()
             }
 
             background: Rectangle{
@@ -36,7 +35,7 @@ Window {
             width: cel.width
             height: cel.height
 
-            border.color: "transparent"
+            border.color: "black"
             border.width: 1
             }
         }
@@ -55,10 +54,9 @@ Window {
         TextField{
             id: fahr
             Layout.fillWidth: true
+            text: model.fahrenheit
             onTextEdited: {
             controller.setFahr(fahr.text)
-            cel.text = controller.getCelsius()
-            kel.text = controller.getKelvin()
             }
             background: Rectangle{
             id: fahr_background
@@ -84,17 +82,16 @@ Window {
         TextField{
             id: kel
             Layout.fillWidth: true
+            text: model.kelvin
             onTextEdited: {
             controller.setKel(kel.text)
-            cel.text = controller.getCelsius()
-            fahr.text = controller.getFahrenheit()
             }
             background: Rectangle{
             id: kel_background
             width: kel.width
             height: kel.height
 
-            border.color: "transparent"
+            border.color: "black"
             border.width: 1
             }
         }
@@ -105,14 +102,14 @@ Window {
     Connections{
         target: model
                 function onCel_validChanged(opv_new) {
-                    cel_background.border.color = opv_new ? "transparent" : "red"
+                    cel_background.border.color = opv_new ? "black" : "red"
                 }
 
                 function onFahr_validChanged(opv_new) {
-                    fahr_background.border.color = opv_new ? "transparent" : "red"
+                    fahr_background.border.color = opv_new ? "black" : "red"
                 }
                 function onKel_validChanged(opv_new){
-                    kel_background.border.color = opv_new ? "transparent" : "reds"
+                    kel_background.border.color = opv_new ? "black" : "red"
                 }
             }
 }
